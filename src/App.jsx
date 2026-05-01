@@ -14,7 +14,13 @@ function App() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setStudents(studentsData.students);
+      // Load from localStorage if available, otherwise use initial data
+      const savedStudents = localStorage.getItem('students');
+      if (savedStudents) {
+        setStudents(JSON.parse(savedStudents));
+      } else {
+        setStudents(studentsData.students);
+      }
       setLoading(false);
     }, 1500);
 
@@ -27,7 +33,9 @@ function App() {
       ...student,
       createdAt: new Date().toISOString()
     };
-    setStudents([...students, newStudent]);
+    const updatedStudents = [...students, newStudent];
+    setStudents(updatedStudents);
+    localStorage.setItem('students', JSON.stringify(updatedStudents));
     setIsFormOpen(false);
   };
 
@@ -37,16 +45,20 @@ function App() {
   };
 
   const handleUpdateStudent = (updatedStudent) => {
-    setStudents(students.map(student => 
+    const updatedStudents = students.map(student => 
       student.id === updatedStudent.id ? updatedStudent : student
-    ));
+    );
+    setStudents(updatedStudents);
+    localStorage.setItem('students', JSON.stringify(updatedStudents));
     setIsFormOpen(false);
     setEditingStudent(null);
   };
 
   const handleDeleteStudent = (id) => {
     if (window.confirm('Are you sure you want to delete this student?')) {
-      setStudents(students.filter(student => student.id !== id));
+      const updatedStudents = students.filter(student => student.id !== id);
+      setStudents(updatedStudents);
+      localStorage.setItem('students', JSON.stringify(updatedStudents));
     }
   };
 
